@@ -4,9 +4,7 @@ from django.core.validators import MinValueValidator
 
 
 class Customer(models.Model):
-    name = models.CharField(
-        max_length=100,
-    )
+    name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
 
@@ -15,9 +13,7 @@ class Customer(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(
-        max_length=100,
-    )
+    name = models.CharField(max_length=100)
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,

@@ -109,7 +109,7 @@ class BulkCreateCustomers(graphene.Mutation):
             required=True,
         )
 
-    created = List(CustomerType)
+    created = graphene.List(CustomerType)
     errors = List(graphene.String)
 
     @staticmethod
