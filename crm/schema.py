@@ -19,7 +19,7 @@ def validate_phone(phone: str):
     return re.match(pattern, phone) is not None
 
 
-class ProductNode(DjangoObjectType):
+class ProductType(DjangoObjectType):
 
     class Meta:
         model = Product
@@ -27,7 +27,7 @@ class ProductNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
-class CustomerNode(DjangoObjectType):
+class CustomerType(DjangoObjectType):
 
     class Meta:
         model = Customer
@@ -35,7 +35,7 @@ class CustomerNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
-class OrderNode(DjangoObjectType):
+class OrderType(DjangoObjectType):
 
     class Meta:
         model = Order
@@ -47,15 +47,17 @@ class OrderNode(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    order = relay.Node.Field(OrderNode)
-    all_orders = DjangoFilterConnectionField(OrderNode)
+    order = relay.Node.graphene.Field(OrderType)
+    all_orders = DjangoFilterConnectiongraphene.Field(OrderType)
 
-    customer = relay.Node.Field(CustomerNode)
-    all_customers = DjangoFilterConnectionField(CustomerNode)
-    customer_by_name = graphene.Field(CustomerNode, name=graphene.String(required=True))
+    customer = relay.Node.graphene.Field(CustomerType)
+    all_customers = DjangoFilterConnectiongraphene.Field(CustomerType)
+    customer_by_name = graphene.graphene.Field(
+        CustomerType, name=graphene.String(required=True)
+    )
 
-    product = relay.Node.Field(ProductNode)
-    all_products = DjangoFilterConnectionField(ProductNode)
+    product = relay.Node.graphene.Field(ProductType)
+    all_products = DjangoFilterConnectiongraphene.Field(ProductType)
 
 
 # class CustomerMutation(SerializerMutation):
@@ -79,7 +81,7 @@ class CreateCustomer(graphene.Mutation):
         email = graphene.String(required=True)
         phone = graphene.String(required=False)
 
-    customer = Field(CustomerNode)
+    customer = graphene.Field(CustomerType)
     message = graphene.String()
 
     @staticmethod
@@ -107,7 +109,7 @@ class BulkCreateCustomers(graphene.Mutation):
             required=True,
         )
 
-    created = List(CustomerNode)
+    created = List(CustomerType)
     errors = List(graphene.String)
 
     @staticmethod
@@ -146,7 +148,7 @@ class CreateProduct(graphene.Mutation):
         price = graphene.Float(required=True)
         stock = graphene.Int(required=False)
 
-    product = Field(ProductNode)
+    product = graphene.Field(ProductType)
     message = graphene.String()
 
     @staticmethod
@@ -169,7 +171,7 @@ class CreateOrder(graphene.Mutation):
         product_ids = List(graphene.ID, required=True)
         order_date = graphene.DateTime(required=False)
 
-    order = Field(OrderNode)
+    order = graphene.Field(OrderType)
     message = graphene.String()
 
     @staticmethod
@@ -203,8 +205,8 @@ class CreateOrder(graphene.Mutation):
         return CreateOrder(order=order, message="Order created successfully.")
 
 
-class Mutation:
-    create_customer = (CreateCustomer.Field(),)
+class Mutation(graphene.ObjectType):
+    create_customer = CreateCustomer.Field()
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field
