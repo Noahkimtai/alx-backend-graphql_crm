@@ -6,6 +6,8 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.rest_framework.mutation import SerializerMutation
 
+from .filters import CustomerFilter, ProductFilter, OrderFilter
+
 from .models import Product, Order, Customer
 from .serializers import ProductSerializer, OrderSerializer, CustomerSerializer
 
@@ -23,7 +25,7 @@ class ProductType(DjangoObjectType):
 
     class Meta:
         model = Product
-        filter_fields = ["name", "stock"]
+        filterset_class = ProductFilter
         interfaces = (relay.Node,)
 
 
@@ -31,7 +33,7 @@ class CustomerType(DjangoObjectType):
 
     class Meta:
         model = Customer
-        filter_fields = ["name", "email"]
+        filterset_class = CustomerFilter
         interfaces = (relay.Node,)
 
 
@@ -39,40 +41,19 @@ class OrderType(DjangoObjectType):
 
     class Meta:
         model = Order
-        filter_fields = {
-            "customer": ["exact"],
-            "products": ["exact"],
-        }
+        filterset_class = OrderFilter
         interfaces = (relay.Node,)
 
 
 class Query(graphene.ObjectType):
-    order = relay.Node.graphene.Field(OrderType)
-    all_orders = DjangoFilterConnectiongraphene.Field(OrderType)
+    customer = relay.Node.Field(CustomerType)
+    all_customers = DjangoFilterConnectionField(CustomerType)
 
-    customer = relay.Node.graphene.Field(CustomerType)
-    all_customers = DjangoFilterConnectiongraphene.Field(CustomerType)
-    customer_by_name = graphene.graphene.Field(
-        CustomerType, name=graphene.String(required=True)
-    )
+    product = relay.Node.Field(ProductType)
+    all_products = DjangoFilterConnectionField(ProductType)
 
-    product = relay.Node.graphene.Field(ProductType)
-    all_products = DjangoFilterConnectiongraphene.Field(ProductType)
-
-
-# class CustomerMutation(SerializerMutation):
-#     class Metat:
-#         serializer_class = CustomerSerializer
-
-
-# class ProductMutation(SerializerMutation):
-#     class Metat:
-#         serializer_class = ProductSerializer
-
-
-# class OrderMutation(SerializerMutation):
-#     class Metat:
-#         serializer_class = OrderSerializer
+    order = relay.Node.Field(OrderType)
+    all_orders = DjangoFilterConnectionField(OrderType)
 
 
 class CreateCustomer(graphene.Mutation):
